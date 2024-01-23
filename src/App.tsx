@@ -26,7 +26,7 @@ function App() {
     <div>
       <ul>
         <a href={`${import.meta.env.VITE_CV_GEN_URL}?token=${token}`}>CV Gen</a>
-        <a href={`${import.meta.env.VITE_TIMETRACKER_URL}?token=${token}`}>
+        <a href={`${import.meta.env.VITE_TIME_TRACKER_URL}?token=${token}`}>
           CV Time Tracker
         </a>
       </ul>
