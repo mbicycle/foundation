@@ -18,8 +18,8 @@ function App() {
   return (
     <div>
       <ul>
-        <a href="http://localhost:3001">CV Gen</a>
-        <a href="http://localhost:3002">CV Time Tracker</a>
+        <a href={import.meta.env.VITE_CV_GEN_URL}>CV Gen</a>
+        <a href={import.meta.env.VITE_CV_GEN_URL}>CV Time Tracker</a>
       </ul>
       <button onClick={logout}>Logout</button>
     </div>
