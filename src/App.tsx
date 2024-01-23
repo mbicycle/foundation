@@ -4,7 +4,7 @@ function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
 
   console.log(token);
-  const auth = () => setCookie("token", "abc", { sameSite: "none" });
+  const auth = () => setCookie("token", "abc", {});
 
   const logout = () => removeCookie("token");
 
