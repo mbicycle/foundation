@@ -3,7 +3,6 @@ import { useCookies } from "react-cookie";
 function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
 
-  console.log(token);
   const TOKEN = "1bc";
 
   const auth = () => {
@@ -26,8 +25,10 @@ function App() {
   return (
     <div>
       <ul>
-        <a href={import.meta.env.VITE_CV_GEN_URL}>CV Gen</a>
-        <a href={import.meta.env.VITE_CV_GEN_URL}>CV Time Tracker</a>
+        <a href={`${import.meta.env.VITE_CV_GEN_URL}?token=${token}`}>CV Gen</a>
+        <a href={`${import.meta.env.VITE_TIMETRACKER_URL}?token=${token}`}>
+          CV Time Tracker
+        </a>
       </ul>
       <button onClick={logout}>Logout</button>
     </div>
