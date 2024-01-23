@@ -9,7 +9,6 @@ function App() {
   const auth = () => {
     setCookie("token", TOKEN, {
       path: "/",
-      domain: ".netlify.app",
       secure: true,
       sameSite: "none",
     });
