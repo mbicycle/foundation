@@ -4,7 +4,20 @@ function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
 
   console.log(token);
-  const auth = () => setCookie("token", "abc", { maxAge: 10000000000 });
+  const TOKEN = "1bc";
+
+  const auth = () => {
+    setCookie("token", TOKEN, {
+      maxAge: 10000000000,
+      domain: import.meta.env.VITE_CV_GEN_URL,
+    });
+    setCookie("token", TOKEN, {
+      maxAge: 10000000000,
+      domain: import.meta.env.VITE_TIME_TRACKER_URL,
+    });
+
+    setCookie("token", TOKEN, { maxAge: 10000000000 });
+  };
 
   const logout = () => removeCookie("token");
 
