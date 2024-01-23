@@ -7,7 +7,12 @@ function App() {
   const TOKEN = "1bc";
 
   const auth = () => {
-    setCookie("token", TOKEN, { path: "/", domain: ".netlify.app" });
+    setCookie("token", TOKEN, {
+      path: "/",
+      domain: ".netlify.app",
+      secure: true,
+      sameSite: "none",
+    });
   };
 
   const logout = () => removeCookie("token");
