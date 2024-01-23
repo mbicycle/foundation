@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 
 function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
-
+  const searchParams = new URLSearchParams(window.location.search);
   const TOKEN = "1bc";
 
   const auth = () => {
@@ -14,6 +15,13 @@ function App() {
   };
 
   const logout = () => removeCookie("token");
+
+  useEffect(() => {
+    if (searchParams.get("unauth")) {
+      removeCookie("token");
+      window.history.replaceState({}, "", "/");
+    }
+  }, [removeCookie, searchParams]);
 
   if (!token)
     return (
