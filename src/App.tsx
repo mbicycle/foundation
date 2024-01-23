@@ -4,7 +4,7 @@ function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
 
   console.log(token);
-  const auth = () => setCookie("token", "abc", {});
+  const auth = () => setCookie("token", "abc", { maxAge: 10000000000 });
 
   const logout = () => removeCookie("token");
 
