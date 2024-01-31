@@ -44,8 +44,12 @@ function App() {
 
   if (!token)
     return (
-      <div>
-        <button onClick={auth}>Auth</button>
+      <div className="bg-slate-900 w-[100dvw] h-[100dvh] flex justify-center items-center">
+        <button
+            onClick={auth}
+            className="bg-blue-400 text-white px-4 py-2 rounded-md">
+          Auth
+        </button>
       </div>
     );
 
