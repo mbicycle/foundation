@@ -1,27 +1,46 @@
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
+import * as authFn from './utils/msal/auth'
+import msGraph from "./utils/msal/msGraph.ts";
 
 function App() {
   const [{ token }, setCookie, removeCookie] = useCookies(["token"]);
   const searchParams = new URLSearchParams(window.location.search);
-  const TOKEN = "1bc";
 
-  const auth = () => {
-    setCookie("token", TOKEN, {
-      path: "/",
-      secure: true,
-      sameSite: "none",
-    });
+  const auth = async () => {
+    try {
+      const user = await authFn.loginFn()
+      console.log("auth user", user)
+      setCookie("token", user.accessToken, {
+        path: "/",
+        secure: true,
+        sameSite: "none",
+      });
+    } catch (e) {
+      console.error(e)
+    }
   };
 
-  const logout = () => removeCookie("token");
+  const logout = () => {
+    authFn.logoutFn()
+    removeCookie("token")
+  };
+
+  useEffect(() => {
+    msGraph.acquireToken().then(result => {
+      console.log('msGraph.getToken()', result)
+      if (result){
+        setCookie('token', result.accessToken)
+      }
+    })
+  }, [setCookie]);
 
   useEffect(() => {
     if (searchParams.get("unauth")) {
-      removeCookie("token");
+      logout();
       window.history.replaceState({}, "", "/");
     }
-  }, [removeCookie, searchParams]);
+  }, [logout, removeCookie, searchParams]);
 
   if (!token)
     return (
