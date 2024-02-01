@@ -1,5 +1,6 @@
-import {AuthenticationResult} from "@azure/msal-browser";
+import type { AuthenticationResult } from '@azure/msal-browser';
 
+export type UserRole = 'admin' | 'god' | 'user' | 'guest';
 export interface MsUser {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     businessPhones: any[];
@@ -31,9 +32,8 @@ export interface IdTokenClaims {
     tid: string;
     uti: string;
     ver: string;
-    roles: string[]
+    roles: UserRole[]
 }
-
 
 export interface AuthModel extends AuthenticationResult{
     idTokenClaims: IdTokenClaims;

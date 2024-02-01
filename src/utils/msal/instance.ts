@@ -1,5 +1,5 @@
-import msGraph from "./msGraph.ts";
+import msGraph from './msGraph';
 
 const { msalInstance } = msGraph;
 
-export default msalInstance
+export default msalInstance;

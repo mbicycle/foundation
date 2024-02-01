@@ -19,36 +19,36 @@ import { LogLevel } from '@azure/msal-browser';
 const redirectUri = import.meta.env.NODE_ENV === 'development' ? 'https://localhost:3000/' : import.meta.env.VITE_REDIRECT_URL;
 
 export const msalConfig: Configuration = {
-    auth: {
-        clientId: import.meta.env.VITE_CLIENT_ID || '',
-        authority: import.meta.env.VITE_CLIENT_AUTHORITY || '',
-        redirectUri,
-        navigateToLoginRequestUrl: true,
-        postLogoutRedirectUri: redirectUri,
-    },
-    cache: {
-        cacheLocation: 'localStorage', // This configures where your cache will be stored
-        storeAuthStateInCookie: true, // Set this to "true" if you are having issues on IE11 or Edge
-        secureCookies: true,
-    },
-    system: {
-        loggerOptions: {
-            loggerCallback: (level: number, message: string, containsPii: boolean): void => {
-                if (containsPii) return;
+  auth: {
+    clientId: import.meta.env.VITE_CLIENT_ID || '',
+    authority: import.meta.env.VITE_CLIENT_AUTHORITY || '',
+    redirectUri,
+    navigateToLoginRequestUrl: true,
+    postLogoutRedirectUri: redirectUri,
+  },
+  cache: {
+    cacheLocation: 'localStorage', // This configures where your cache will be stored
+    storeAuthStateInCookie: true, // Set this to "true" if you are having issues on IE11 or Edge
+    secureCookies: true,
+  },
+  system: {
+    loggerOptions: {
+      loggerCallback: (level: number, message: string, containsPii: boolean): void => {
+        if (containsPii) return;
 
-                switch (level) {
-                    case LogLevel.Error:
-                        console.error(message);
-                        return;
-                    case LogLevel.Warning:
-                        console.warn(message);
-                        break;
-                    default:
-                        break;
-                }
-            },
-        },
+        switch (level) {
+          case LogLevel.Error:
+            console.error(message);
+            return;
+          case LogLevel.Warning:
+            console.warn(message);
+            break;
+          default:
+            break;
+        }
+      },
     },
+  },
 };
 
 /**
@@ -58,5 +58,5 @@ export const msalConfig: Configuration = {
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-    scopes: ['User.ReadWrite.All'],
+  scopes: ['User.ReadWrite.All'],
 };
