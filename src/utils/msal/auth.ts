@@ -1,8 +1,9 @@
 import {loginRequest, msalConfig} from "./config.ts";
 import msalInstance from "./instance.ts";
+import { AuthModel } from "./models";
 
-async function loginFn() {
-   return msalInstance.loginPopup(loginRequest)
+function loginFn(): Promise<AuthModel> {
+   return msalInstance.loginPopup(loginRequest) as Promise<AuthModel>
 }
 
 async function logoutFn(): Promise<void> {

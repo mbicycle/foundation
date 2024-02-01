@@ -1,4 +1,4 @@
-import type {AccountInfo, AuthenticationResult, SilentRequest} from '@azure/msal-browser';
+import type {AccountInfo, SilentRequest} from '@azure/msal-browser';
 import { InteractionRequiredAuthError, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { Client } from '@microsoft/microsoft-graph-client';
 import {
@@ -6,6 +6,7 @@ import {
 } from '@microsoft/microsoft-graph-client/authProviders/authCodeMsalBrowser';
 
 import { loginRequest, msalConfig } from './config.ts';
+import {AuthModel} from "./models";
 
 const msGraph = (): {
     graphClient: Client,
@@ -13,7 +14,7 @@ const msGraph = (): {
     msalInstance: PublicClientApplication,
     setActiveAccount: () => Promise<AccountInfo | null>
     getRequest: () => SilentRequest
-    acquireToken: () => Promise<AuthenticationResult | null>
+    acquireToken: () => Promise<AuthModel | null>
 } => {
     const msalInstance = new PublicClientApplication(msalConfig);
     msalInstance.initialize()
@@ -33,15 +34,15 @@ const msGraph = (): {
 
     const acquireToken = async () => {
         const request = getRequest();
-        let result: AuthenticationResult | null = null;
+        let result: AuthModel | null = null;
         try {
             console.log('acquireTokenSilent');
-            result = await msalInstance.acquireTokenSilent(request);
+            result = await msalInstance.acquireTokenSilent(request) as AuthModel;
         } catch (error) {
             if (error instanceof InteractionRequiredAuthError) {
                 // fallback to interaction when silent call fails
                 console.log("InteractionRequiredAuthError")
-                result = await msalInstance.acquireTokenSilent(request);
+                result = await msalInstance.acquireTokenSilent(request) as AuthModel;
             }
             console.log("acquireToken error", error);
         }
