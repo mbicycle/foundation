@@ -2,6 +2,7 @@ import {useCookies} from "react-cookie";
 import * as authFn from "../utils/msal/auth.ts";
 import {useCallback, useEffect, useState} from "react";
 import msGraph from "../utils/msal/msGraph.ts";
+import {getGuestTokenValidity} from "../utils/api.ts";
 
 export const useAuth = () => {
     const [userName, setUserName] = useState('')
@@ -30,31 +31,48 @@ export const useAuth = () => {
     };
 
     const logout = useCallback(() => {
-        authFn.logoutFn()
+        if (role !== 'guest') authFn.logoutFn()
         setUserName('')
-        removeCookie("token", )
+        removeCookie("token")
         removeCookie("role")
-    }, [removeCookie]);
+        window.history.replaceState({}, "", "/")
+    }, [removeCookie, role]);
 
 
 
+    // TODO: do we log in or log out if there is no token but there is ms acc
     useEffect(() => {
-        msGraph.acquireToken().then(result => {
-            console.log('msGraph.getToken()', result)
-            if (result){
-                setUserName(result.account.username)
-                setCookie('token', result.accessToken)
-                setCookie('role', result.idTokenClaims.roles[0] || '')
-            }
-        })
-    }, [setCookie]);
+        if (!token && role !== 'guest'){
+            msGraph.acquireToken().then(result => {
+                console.log('msGraph.getToken()', result)
+                if (result){
+                    setUserName(result.account.username)
+                    setCookie('token', result.accessToken)
+                    setCookie('role', result.idTokenClaims.roles[0] || '')
+                }
+            })
+        }
+    }, [role, setCookie, token]);
 
     useEffect(() => {
         if (searchParams.get("unauth")) {
             logout();
-            window.history.replaceState({}, "", "/");
         }
-    }, [logout, removeCookie, searchParams]);
+
+        const guestToken = searchParams.get('token')
+        if (guestToken){
+            getGuestTokenValidity(guestToken)
+                .then((isValid) => {
+                    if (isValid){
+                        setUserName("Guest")
+                        setCookie('token', guestToken)
+                        setCookie('role', "guest")
+                    }else {
+                        alert('Token invalid')
+                    }
+                });
+        }
+    }, [logout, removeCookie, searchParams, setCookie]);
 
 
     return {
