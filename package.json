@@ -11,9 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@azure/msal-browser": "^3.7.1",
-    "@azure/msal-react": "^2.0.10",
-    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "msal-bundle": "file:msal-bundle-0.1.0.tgz",
     "react": "^18.2.0",
     "react-cookie": "^7.0.1",
     "react-dom": "^18.2.0"

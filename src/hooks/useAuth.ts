@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import * as msGraph from 'msal-bundle';
+import type { UserRole } from 'msal-bundle/dist/models';
 
 import { getGuestTokenValidity } from 'utils/api';
-import * as authFn from 'utils/msal/auth';
-import type { UserRole } from 'utils/msal/models';
-import msGraph from 'utils/msal/msGraph';
 
 export const useAuth = () => {
   const [userName, setUserName] = useState('');
@@ -20,7 +19,7 @@ export const useAuth = () => {
 
   const login = async () => {
     try {
-      const user = await authFn.loginFn();
+      const user = await msGraph.loginFn();
       console.log('auth user', user);
       setUserName(user.account.username);
       setCookie('token', user.accessToken, {
@@ -39,7 +38,7 @@ export const useAuth = () => {
   };
 
   const logout = useCallback(() => {
-    if (role !== 'guest') authFn.logoutFn();
+    if (role !== 'guest') msGraph.logoutFn();
     setUserName('');
     removeCookie('token');
     removeCookie('role');
@@ -48,17 +47,15 @@ export const useAuth = () => {
 
   // TODO: do we log in or log out if there is no token but there is ms acc
   useEffect(() => {
-    if (!token && role !== 'guest') {
-      msGraph.acquireToken().then((result) => {
-        console.log('msGraph.getToken()', result);
-        if (result) {
-          setUserName(result.account.username);
-          setCookie('token', result.accessToken);
-          setCookie('role', result.idTokenClaims.roles[0] || '');
-        }
-      });
-    }
-  }, [role, setCookie, token]);
+    msGraph.acquireToken().then((result) => {
+      console.log('msGraph.getToken()', result);
+      if (result) {
+        setUserName(result.account.username);
+        setCookie('token', result.accessToken);
+        setCookie('role', result.idTokenClaims.roles[0] || '');
+      }
+    });
+  }, [setCookie]);
 
   useEffect(() => {
     if (searchParams.get('unauth')) {

@@ -2,7 +2,11 @@ import { useAuth } from './hooks/useAuth';
 
 function App() {
   const {
-    logout, login, token, role, userName,
+    logout,
+    login,
+    token,
+    role,
+    userName,
   } = useAuth();
 
   if (!token) {
@@ -41,14 +45,16 @@ function App() {
       <p className="text-3xl text-center py-6"> MBicycle Foundation</p>
       <ul className="flex mb-10 gap-10 p-10">
         <a
-          href={`${import.meta.env.VITE_CV_GEN_URL}?token=${token}`}
-          className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md"
+          href={`${import.meta.env.VITE_CV_GEN_URL}?token=${token}&role=${role}`}
+          className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md
+           hover:bg-slate-700"
         >
           CV Gen
         </a>
         <a
-          href={`${import.meta.env.VITE_TIME_TRACKER_URL}?token=${token}`}
-          className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md"
+          href={`${import.meta.env.VITE_TIME_TRACKER_URL}?token=${token}&role=${role}`}
+          className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md
+           hover:bg-slate-700"
         >
           CV Time Tracker
         </a>
