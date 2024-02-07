@@ -3,7 +3,6 @@ import { useCookies } from 'react-cookie';
 import * as msGraph from 'msal-bundle';
 import type { UserRole } from 'msal-bundle/dist/models';
 
-import { getGuestTokenValidity } from 'utils/api';
 import { AuthState } from 'utils/const';
 
 // TODO:
@@ -25,7 +24,6 @@ export const useAuth = () => {
     token?: string;
     role?: UserRole;
   }>(['token', 'role']);
-  const searchParams = new URLSearchParams(window.location.search);
 
   console.log('searchParams', window.location.search);
 
@@ -68,6 +66,8 @@ export const useAuth = () => {
   }, [setCookie]);
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+
     const queryLogout = searchParams.get('logout');
     if (queryLogout) {
       console.log('unauth');
@@ -76,7 +76,7 @@ export const useAuth = () => {
 
     const queryGuestToken = searchParams.get('token');
     if (queryGuestToken) {
-      getGuestTokenValidity(queryGuestToken)
+      msGraph.getGuestTokenValidity(queryGuestToken)
         .then((isValid) => {
           if (isValid) {
             setAuthState(AuthState.LoggedIn);
@@ -90,7 +90,7 @@ export const useAuth = () => {
           }
         });
     }
-  }, [guestToken, logout, removeCookie, searchParams, setCookie]);
+  }, [guestToken, logout, removeCookie, setCookie]);
 
   return {
     userName,
