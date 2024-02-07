@@ -4,9 +4,19 @@ import * as msGraph from 'msal-bundle';
 import type { UserRole } from 'msal-bundle/dist/models';
 
 import { getGuestTokenValidity } from 'utils/api';
+import { AuthState } from 'utils/const';
+
+// TODO:
+const cookieOptions = {
+  // path: '/',
+  // sameSite: 'none',
+};
 
 export const useAuth = () => {
+  const [authState, setAuthState] = useState(AuthState.Loading);
   const [userName, setUserName] = useState('');
+  const [guestToken, setGuestToken] = useState('');
+
   const [
     { token, role },
     setCookie,
@@ -17,71 +27,78 @@ export const useAuth = () => {
   }>(['token', 'role']);
   const searchParams = new URLSearchParams(window.location.search);
 
+  console.log('searchParams', window.location.search);
+
   const login = async () => {
     try {
       const user = await msGraph.loginFn();
       console.log('auth user', user);
       setUserName(user.account.username);
-      setCookie('token', user.accessToken, {
-        path: '/',
-        secure: true,
-        sameSite: 'none',
-      });
-      setCookie('role', user.idTokenClaims.roles[0] || '', {
-        path: '/',
-        secure: true,
-        sameSite: 'none',
-      });
+      setAuthState(AuthState.LoggedIn);
+      setCookie('token', user.accessToken, cookieOptions);
     } catch (e) {
       console.error(e);
+      setAuthState(AuthState.LoggedOut);
     }
   };
 
-  const logout = useCallback(() => {
-    if (role !== 'guest') msGraph.logoutFn();
+  const logout = useCallback(async () => {
     setUserName('');
     removeCookie('token');
     removeCookie('role');
+    setAuthState(AuthState.LoggedOut);
+    await msGraph.logoutFn(true);
     window.history.replaceState({}, '', '/');
-  }, [removeCookie, role]);
+  }, [removeCookie]);
 
-  // TODO: do we log in or log out if there is no token but there is ms acc
   useEffect(() => {
     msGraph.acquireToken().then((result) => {
       console.log('msGraph.getToken()', result);
       if (result) {
+        setAuthState(AuthState.LoggedIn);
         setUserName(result.account.username);
-        setCookie('token', result.accessToken);
-        setCookie('role', result.idTokenClaims.roles[0] || '');
+        setCookie('token', result.accessToken, cookieOptions);
+      } else {
+        setAuthState(AuthState.LoggedOut);
       }
+    }).catch((e) => {
+      console.error(e);
+      setAuthState(AuthState.LoggedOut);
     });
   }, [setCookie]);
 
   useEffect(() => {
-    if (searchParams.get('unauth')) {
+    const queryLogout = searchParams.get('logout');
+    if (queryLogout) {
+      console.log('unauth');
       logout();
     }
 
-    const guestToken = searchParams.get('token');
-    if (guestToken) {
-      getGuestTokenValidity(guestToken)
+    const queryGuestToken = searchParams.get('token');
+    if (queryGuestToken) {
+      getGuestTokenValidity(queryGuestToken)
         .then((isValid) => {
           if (isValid) {
+            setAuthState(AuthState.LoggedIn);
             setUserName('Guest');
-            setCookie('token', guestToken);
+            setGuestToken(queryGuestToken);
+            setCookie('token', guestToken, cookieOptions);
             setCookie('role', 'guest');
           } else {
             alert('Token invalid');
+            setAuthState(AuthState.LoggedOut);
           }
         });
     }
-  }, [logout, removeCookie, searchParams, setCookie]);
+  }, [guestToken, logout, removeCookie, searchParams, setCookie]);
 
   return {
     userName,
     token,
+    guestToken,
     role,
     login,
     logout,
+    authState,
   };
 };

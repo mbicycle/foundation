@@ -1,15 +1,22 @@
+import { AuthState } from 'utils/const.ts';
+
 import { useAuth } from './hooks/useAuth';
 
 function App() {
   const {
     logout,
     login,
-    token,
+    guestToken,
     role,
     userName,
+    authState,
   } = useAuth();
 
-  if (!token) {
+  if (authState === AuthState.Loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (authState === AuthState.LoggedOut) {
     return (
       <div className="bg-slate-900 w-[100dvw] h-[100dvh] flex justify-center items-center">
         <button
@@ -22,6 +29,13 @@ function App() {
       </div>
     );
   }
+
+  const searhParams = new URLSearchParams();
+  if (guestToken) searhParams.set('token', guestToken);
+  if (role) searhParams.set('role', role);
+
+  const cvgenUrl = `${import.meta.env.VITE_CV_GEN_URL}?${searhParams.toString()}`;
+  const timeUrl = `${import.meta.env.VITE_TIME_TRACKER_URL}?${searhParams.toString()}`;
 
   return (
     <div className="bg-slate-900 w-[100dvw] h-[100dvh] text-slate-300">
@@ -45,14 +59,14 @@ function App() {
       <p className="text-3xl text-center py-6"> MBicycle Foundation</p>
       <ul className="flex mb-10 gap-10 p-10">
         <a
-          href={`${import.meta.env.VITE_CV_GEN_URL}?token=${token}&role=${role}`}
+          href={cvgenUrl}
           className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md
            hover:bg-slate-700"
         >
           CV Gen
         </a>
         <a
-          href={`${import.meta.env.VITE_TIME_TRACKER_URL}?token=${token}&role=${role}`}
+          href={timeUrl}
           className="border aspect-square border-slate-500 w-[15rem] flex justify-center items-center rounded-md
            hover:bg-slate-700"
         >
