@@ -1,39 +1,37 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import * as msGraph from 'msal-bundle';
-import type { UserRole } from 'msal-bundle/dist/models';
 
 import { AuthState } from 'utils/const';
+import type { CookieSetOptions } from 'utils/types';
 
-// TODO:
-const cookieOptions = {
-  // path: '/',
-  // sameSite: 'none',
+interface IUser {
+  name: string
+  role: string
+}
+
+const cookieOptions: CookieSetOptions = {
+  path: '/',
+  sameSite: 'none',
+  secure: true,
 };
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState(AuthState.Loading);
-  const [userName, setUserName] = useState('');
+  const [user, setUser] = useState<IUser | null>(null);
   const [guestToken, setGuestToken] = useState('');
 
-  const [
-    { token, role },
-    setCookie,
-    removeCookie,
-  ] = useCookies<'token' | 'role', {
-    token?: string;
-    role?: UserRole;
-  }>(['token', 'role']);
-
-  console.log('searchParams', window.location.search);
+  const [{ token }, setCookie, removeCookie] = useCookies(['token']);
 
   const login = async () => {
     try {
-      const user = await msGraph.loginFn();
-      console.log('auth user', user);
-      setUserName(user.account.username);
+      const authResult = await msGraph.loginFn();
+      setUser({
+        name: authResult.account.username,
+        role: authResult.idTokenClaims.roles[0] || '',
+      });
       setAuthState(AuthState.LoggedIn);
-      setCookie('token', user.accessToken, cookieOptions);
+      setCookie('token', authResult.accessToken, cookieOptions);
     } catch (e) {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
@@ -41,37 +39,20 @@ export const useAuth = () => {
   };
 
   const logout = useCallback(async () => {
-    setUserName('');
+    setUser(null);
+    setGuestToken('');
     removeCookie('token');
-    removeCookie('role');
     setAuthState(AuthState.LoggedOut);
     await msGraph.logoutFn(true);
-    window.history.replaceState({}, '', '/');
   }, [removeCookie]);
-
-  useEffect(() => {
-    msGraph.acquireToken().then((result) => {
-      console.log('msGraph.getToken()', result);
-      if (result) {
-        setAuthState(AuthState.LoggedIn);
-        setUserName(result.account.username);
-        setCookie('token', result.accessToken, cookieOptions);
-      } else {
-        setAuthState(AuthState.LoggedOut);
-      }
-    }).catch((e) => {
-      console.error(e);
-      setAuthState(AuthState.LoggedOut);
-    });
-  }, [setCookie]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
     const queryLogout = searchParams.get('logout');
     if (queryLogout) {
-      console.log('unauth');
       logout();
+      return;
     }
 
     const queryGuestToken = searchParams.get('token');
@@ -80,23 +61,41 @@ export const useAuth = () => {
         .then((isValid) => {
           if (isValid) {
             setAuthState(AuthState.LoggedIn);
-            setUserName('Guest');
+            setUser({
+              name: 'Guest',
+              role: 'guest',
+            });
             setGuestToken(queryGuestToken);
-            setCookie('token', guestToken, cookieOptions);
-            setCookie('role', 'guest');
+            // setCookie('guestToken', queryGuestToken, cookieOptions);
           } else {
-            alert('Token invalid');
+            alert('Guest token is invalid');
             setAuthState(AuthState.LoggedOut);
           }
         });
+      return;
     }
-  }, [guestToken, logout, removeCookie, setCookie]);
+
+    msGraph.acquireToken().then((result) => {
+      if (result) {
+        setAuthState(AuthState.LoggedIn);
+        setUser({
+          name: result.account.username,
+          role: result.idTokenClaims.roles[0] || '',
+        });
+        setCookie('token', result.accessToken, cookieOptions);
+      } else {
+        setAuthState(AuthState.LoggedOut);
+      }
+    }).catch((e) => {
+      console.error(e);
+      setAuthState(AuthState.LoggedOut);
+    });
+  }, [logout, removeCookie, setCookie]);
 
   return {
-    userName,
+    user,
     token,
     guestToken,
-    role,
     login,
     logout,
     authState,

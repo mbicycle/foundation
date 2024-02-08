@@ -1,4 +1,4 @@
-import { AuthState } from 'utils/const.ts';
+import { AuthState } from 'utils/const';
 
 import { useAuth } from './hooks/useAuth';
 
@@ -7,8 +7,7 @@ function App() {
     logout,
     login,
     guestToken,
-    role,
-    userName,
+    user,
     authState,
   } = useAuth();
 
@@ -30,23 +29,17 @@ function App() {
     );
   }
 
-  const searhParams = new URLSearchParams();
-  if (guestToken) searhParams.set('token', guestToken);
-  if (role) searhParams.set('role', role);
+  const searchParams = new URLSearchParams();
+  if (guestToken) searchParams.set('token', guestToken);
 
-  const cvgenUrl = `${import.meta.env.VITE_CV_GEN_URL}?${searhParams.toString()}`;
-  const timeUrl = `${import.meta.env.VITE_TIME_TRACKER_URL}?${searhParams.toString()}`;
+  const cvgenUrl = `${import.meta.env.VITE_CV_GEN_URL}?${searchParams.toString()}`;
+  const timeUrl = `${import.meta.env.VITE_TIME_TRACKER_URL}?${searchParams.toString()}`;
 
   return (
     <div className="bg-slate-900 w-[100dvw] h-[100dvh] text-slate-300">
       <header className="bg-slate-800 w-full px-10 py-4 flex items-center justify-between">
         <div>
-          <p>
-            Logged in as
-            {userName}
-            , Role:
-            {role}
-          </p>
+          <p>{`Logged in as ${user?.name}, Role: ${user?.role}`}</p>
         </div>
         <button
           onClick={logout}
