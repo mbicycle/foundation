@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import * as msGraph from '@mbicycle/msal-bundle';
+import { getGuestTokenValidity, loginFn, logoutFn } from '@mbicycle/msal-bundle';
 
 import { AuthState } from 'utils/const';
+import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
 
 interface IUser {
@@ -25,7 +26,7 @@ export const useAuth = () => {
 
   const login = async () => {
     try {
-      const authResult = await msGraph.loginFn();
+      const authResult = await loginFn(msGraphInstance.msalInstance);
       setUser({
         name: authResult.account.username,
         role: authResult.idTokenClaims.roles[0] || '',
@@ -43,7 +44,7 @@ export const useAuth = () => {
     setGuestToken('');
     removeCookie('token');
     setAuthState(AuthState.LoggedOut);
-    await msGraph.logoutFn(true);
+    await logoutFn(msGraphInstance.msalInstance, true);
   }, [removeCookie]);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export const useAuth = () => {
 
     const queryGuestToken = searchParams.get('token');
     if (queryGuestToken) {
-      msGraph.getGuestTokenValidity(queryGuestToken)
+      getGuestTokenValidity(queryGuestToken)
         .then((isValid) => {
           if (isValid) {
             setAuthState(AuthState.LoggedIn);
@@ -75,7 +76,7 @@ export const useAuth = () => {
       return;
     }
 
-    msGraph.acquireToken().then((result) => {
+    msGraphInstance.acquireToken().then((result) => {
       if (result) {
         setAuthState(AuthState.LoggedIn);
         setUser({
