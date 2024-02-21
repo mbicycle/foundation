@@ -1,15 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useCookies } from 'react-cookie';
-import { getGuestTokenValidity, loginFn, logoutFn } from '@mbicycle/msal-bundle';
+import { loginFn, logoutFn } from '@mbicycle/msal-bundle';
+import useAuthStore from 'stores/auth';
+import useUserStore from 'stores/user';
 
 import { AuthState } from 'utils/const';
 import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
-
-interface IUser {
-  name: string
-  role: string
-}
 
 const cookieOptions: CookieSetOptions = {
   path: '/',
@@ -18,13 +15,12 @@ const cookieOptions: CookieSetOptions = {
 };
 
 export const useAuth = () => {
-  const [authState, setAuthState] = useState(AuthState.Loading);
-  const [user, setUser] = useState<IUser | null>(null);
-  const [guestToken, setGuestToken] = useState('');
+  const { state: authState, setState: setAuthState } = useAuthStore();
+  const { user, setUser } = useUserStore();
 
   const [{ token }, setCookie, removeCookie] = useCookies(['token']);
 
-  const login = async () => {
+  const login = useCallback(async () => {
     try {
       const authResult = await loginFn(msGraphInstance.msalInstance);
       setUser({
@@ -37,66 +33,18 @@ export const useAuth = () => {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
     }
-  };
+  }, [setAuthState, setCookie, setUser]);
 
   const logout = useCallback(async () => {
     setUser(null);
-    setGuestToken('');
     removeCookie('token');
     setAuthState(AuthState.LoggedOut);
     await logoutFn(msGraphInstance.msalInstance, true);
-  }, [removeCookie]);
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-
-    const queryLogout = searchParams.get('logout');
-    if (queryLogout) {
-      logout();
-      return;
-    }
-
-    const queryGuestToken = searchParams.get('token');
-    if (queryGuestToken) {
-      getGuestTokenValidity(queryGuestToken)
-        .then((isValid) => {
-          if (isValid) {
-            setAuthState(AuthState.LoggedIn);
-            setUser({
-              name: 'Guest',
-              role: 'guest',
-            });
-            setGuestToken(queryGuestToken);
-            // setCookie('guestToken', queryGuestToken, cookieOptions);
-          } else {
-            alert('Guest token is invalid');
-            setAuthState(AuthState.LoggedOut);
-          }
-        });
-      return;
-    }
-
-    msGraphInstance.acquireToken().then((result) => {
-      if (result) {
-        setAuthState(AuthState.LoggedIn);
-        setUser({
-          name: result.account.username,
-          role: result.idTokenClaims.roles[0] || '',
-        });
-        setCookie('token', result.accessToken, cookieOptions);
-      } else {
-        setAuthState(AuthState.LoggedOut);
-      }
-    }).catch((e) => {
-      console.error(e);
-      setAuthState(AuthState.LoggedOut);
-    });
-  }, [logout, removeCookie, setCookie]);
+  }, [removeCookie, setAuthState, setUser]);
 
   return {
     user,
     token,
-    guestToken,
     login,
     logout,
     authState,

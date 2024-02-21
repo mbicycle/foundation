@@ -24,6 +24,12 @@
 
     "baseUrl": "src",
     "paths": {
+      "pages/*": [
+        "pages/*"
+      ],
+      "stores/*": [
+        "stores/*"
+      ],
       "hooks/*": [
         "hooks/*"
       ],
