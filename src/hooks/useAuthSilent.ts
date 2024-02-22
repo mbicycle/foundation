@@ -15,7 +15,7 @@ const cookieOptions: CookieSetOptions = {
 };
 
 export const useAuthSilent = () => {
-  const { state: authState, setState: setAuthState } = useAuthStore();
+  const { setState: setAuthState } = useAuthStore();
   const { setUser } = useUserStore();
 
   const [guestToken, setGuestToken] = useState('');
@@ -71,6 +71,5 @@ export const useAuthSilent = () => {
   return {
     token,
     guestToken,
-    authState,
   };
 };

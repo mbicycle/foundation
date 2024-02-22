@@ -23,20 +23,6 @@
     "forceConsistentCasingInFileNames": true,
 
     "baseUrl": "src",
-    "paths": {
-      "pages/*": [
-        "pages/*"
-      ],
-      "stores/*": [
-        "stores/*"
-      ],
-      "hooks/*": [
-        "hooks/*"
-      ],
-      "utils/*": [
-        "utils/*"
-      ],
-    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

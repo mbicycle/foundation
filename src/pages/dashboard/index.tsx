@@ -1,9 +1,13 @@
 import { memo } from 'react';
+import useUserStore from 'stores/user';
 
 import { useAuth } from 'hooks/useAuth';
+import { useAuthSilent } from 'hooks/useAuthSilent';
 
-function Home() {
-  const { logout, guestToken, user } = useAuth();
+function Dashboard() {
+  useAuthSilent();
+  const { user } = useUserStore();
+  const { logout, guestToken } = useAuth();
 
   const searchParams = new URLSearchParams();
   if (guestToken) searchParams.set('token', guestToken);
@@ -46,4 +50,4 @@ function Home() {
   );
 }
 
-export default memo(Home);
+export default memo(Dashboard);

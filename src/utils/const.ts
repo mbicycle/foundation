@@ -3,3 +3,9 @@ export enum AuthState {
     LoggedIn = 'loggedIn',
     LoggedOut = 'loggedOut',
 }
+
+export enum Routes {
+    Login = '/login',
+    Dashboard = '/dashboard',
+    Redirect = '/',
+}

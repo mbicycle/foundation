@@ -1,19 +1,10 @@
-import {
-  Route,
-  Routes,
-} from 'react-router-dom';
-
-import Home from './pages/home';
-import Login from './pages/login';
+import Router from './components/Router';
 import MainProvider from './providers/main';
 
 function App() {
   return (
     <MainProvider>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
+      <Router />
     </MainProvider>
   );
 }
