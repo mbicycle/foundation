@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from 'stores/auth';
 
 import { useAuth } from 'hooks/useAuth';
-import { AuthState } from 'utils/const';
+import { useAuthSilent } from 'hooks/useAuthSilent';
+import { AuthState, Routes } from 'utils/const';
 
 function Login() {
-  const { state: authState } = useAuthStore();
+  useAuthSilent();
   const { login } = useAuth();
+  const { state: authState } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (authState === AuthState.LoggedIn) {
-      navigate('dashboard');
+      navigate(Routes.Dashboard);
     }
   }, [authState, navigate]);
 

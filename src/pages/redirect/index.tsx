@@ -22,7 +22,7 @@ function Redirect() {
         className="bg-blue-400 text-white px-4 py-2 rounded-md"
         type="button"
       >
-        {authState === AuthState.LoggedIn ? 'Dashboard' : 'Login'}
+        {authState === AuthState.LoggedIn ? 'Dashboard ->' : 'Login ->'}
       </button>
     </div>
   );

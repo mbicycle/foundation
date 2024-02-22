@@ -1,6 +1,6 @@
 import { BrowserRouter } from 'react-router-dom';
 
-function MainProvider({ children }: {children: Node}) {
+function MainProvider({ children }: {children: JSX.Element}) {
   return (
     <BrowserRouter>
       {children}

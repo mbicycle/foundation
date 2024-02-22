@@ -12,6 +12,7 @@ const cookieOptions: CookieSetOptions = {
   path: '/',
   sameSite: 'none',
   secure: true,
+  domain: '.localhost',
 };
 
 export const useAuth = () => {
