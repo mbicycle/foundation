@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 type User = {
     name: string,
@@ -12,10 +12,17 @@ type Store = {
     removeUser: () => void
 }
 
-const useUserStore = create<Store>()(devtools((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  removeUser: () => set({ user: null }),
-})));
+const useUserStore = create<Store>()(
+  devtools(
+    persist(
+      (set) => ({
+        user: null,
+        setUser: (user) => set({ user }),
+        removeUser: () => set({ user: null }),
+      }),
+      { name: 'userStore' },
+    ),
+  ),
+);
 
 export default useUserStore;

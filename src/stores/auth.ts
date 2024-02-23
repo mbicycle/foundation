@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 import { AuthState } from 'utils/const';
 
@@ -8,9 +8,16 @@ type Store = {
     setState: (newState: AuthState) => void
 }
 
-const useAuthStore = create<Store>()(devtools((set) => ({
-  state: AuthState.Loading,
-  setState: (newSate) => set({ state: newSate }),
-})));
+const useAuthStore = create<Store>()(
+  devtools(
+    persist(
+      (set) => ({
+        state: AuthState.Loading,
+        setState: (newSate) => set({ state: newSate }),
+      }),
+      { name: 'AuthStore' },
+    ),
+  ),
+);
 
 export default useAuthStore;
