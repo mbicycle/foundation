@@ -1,8 +1,12 @@
 import { memo } from 'react';
 import Header from 'components/Header';
+import useGuestTokenStore from 'stores/guestToken';
 
 function Dashboard() {
+  const { guestToken } = useGuestTokenStore();
+
   const searchParams = new URLSearchParams();
+  if (guestToken) searchParams.set('guestToken', guestToken);
 
   const cvgenUrl = `${import.meta.env.VITE_CV_GEN_URL}?${searchParams.toString()}`;
   const timeUrl = `${import.meta.env.VITE_TIME_TRACKER_URL}?${searchParams.toString()}`;

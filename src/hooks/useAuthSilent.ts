@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { getGuestTokenValidity, logoutFn } from '@mbicycle/msal-bundle';
 import useAuthStore from 'stores/auth';
+import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
 import { AuthState } from 'utils/const';
@@ -19,7 +20,7 @@ export const useAuthSilent = () => {
   const { setState: setAuthState } = useAuthStore();
   const { setUser } = useUserStore();
 
-  const [guestToken, setGuestToken] = useState('');
+  const { guestToken, setGuestToken } = useGuestTokenStore();
 
   const [{ token }, setCookie, removeCookie] = useCookies(['token']);
 
@@ -43,7 +44,6 @@ export const useAuthSilent = () => {
               role: 'guest',
             });
             setGuestToken(queryGuestToken);
-            // setCookie('guestToken', queryGuestToken, cookieOptions);
           } else {
             alert('Guest token is invalid');
             setAuthState(AuthState.LoggedOut);
@@ -67,7 +67,7 @@ export const useAuthSilent = () => {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
     });
-  }, [removeCookie, setAuthState, setCookie, setUser]);
+  }, [removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
 
   return {
     token,

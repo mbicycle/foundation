@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 import { loginFn, logoutFn } from '@mbicycle/msal-bundle';
 import useAuthStore from 'stores/auth';
+import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
 import { AuthState } from 'utils/const';
@@ -18,6 +19,7 @@ const cookieOptions: CookieSetOptions = {
 export const useAuth = () => {
   const { setState: setAuthState } = useAuthStore();
   const { setUser, removeUser } = useUserStore();
+  const { clearGuestToken } = useGuestTokenStore();
 
   const [{ token }, setCookie, removeCookie] = useCookies(['token']);
 
@@ -38,10 +40,11 @@ export const useAuth = () => {
 
   const logout = useCallback(async () => {
     removeUser();
+    clearGuestToken();
     removeCookie('token');
     setAuthState(AuthState.LoggedOut);
     await logoutFn(msGraphInstance.msalInstance, true);
-  }, [removeCookie, removeUser, setAuthState]);
+  }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
 
   return {
     token,

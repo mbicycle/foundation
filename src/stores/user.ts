@@ -20,7 +20,7 @@ const useUserStore = create<Store>()(
         setUser: (user) => set({ user }),
         removeUser: () => set({ user: null }),
       }),
-      { name: 'userStore' },
+      { name: 'UserStore' },
     ),
   ),
 );

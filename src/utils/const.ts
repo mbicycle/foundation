@@ -5,7 +5,7 @@ export enum AuthState {
 }
 
 export enum Routes {
-    Login = '/login',
+    Login = '/',
     Dashboard = '/dashboard',
-    Redirect = '/',
+    Redirect = '/redirect',
 }
