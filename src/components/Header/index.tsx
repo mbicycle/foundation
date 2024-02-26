@@ -1,8 +1,9 @@
 import { memo } from 'react';
+
 import useAuthStore from 'stores/auth';
 import useUserStore from 'stores/user';
-
 import { useAuth } from 'hooks/useAuth';
+
 import { AuthState } from 'utils/const';
 
 function Header() {
