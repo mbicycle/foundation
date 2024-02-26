@@ -2,7 +2,6 @@ import { memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from 'stores/auth';
 
-import { useAuth } from 'hooks/useAuth';
 import { useAuthSilent } from 'hooks/useAuthSilent';
 import { AuthState, Routes } from 'utils/const';
 

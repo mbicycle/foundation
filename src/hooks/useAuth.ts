@@ -6,6 +6,7 @@ import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
 import { AuthState, COOKIE_NAME } from 'utils/const';
+import CONFIG from 'utils/envConfig';
 import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
 
@@ -13,7 +14,7 @@ const cookieOptions: CookieSetOptions = {
   path: '/',
   sameSite: 'none',
   secure: true,
-  domain: '.localhost',
+  domain: CONFIG.appDomain,
 };
 
 export const useAuth = () => {
@@ -44,7 +45,7 @@ export const useAuth = () => {
     removeCookie(COOKIE_NAME);
     setAuthState(AuthState.LoggedOut);
     if (guestToken) return;
-    await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
+    await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri!);
   }, [clearGuestToken, guestToken, removeCookie, removeUser, setAuthState]);
 
   return {
