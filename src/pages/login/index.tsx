@@ -7,8 +7,7 @@ import { useAuthSilent } from 'hooks/useAuthSilent';
 import { AuthState, Routes } from 'utils/const';
 
 function Login() {
-  useAuthSilent();
-  const { login } = useAuth();
+  const { login } = useAuthSilent();
   const { state: authState } = useAuthStore();
   const navigate = useNavigate();
 

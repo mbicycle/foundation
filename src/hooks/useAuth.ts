@@ -19,7 +19,7 @@ const cookieOptions: CookieSetOptions = {
 export const useAuth = () => {
   const { setState: setAuthState } = useAuthStore();
   const { setUser, removeUser } = useUserStore();
-  const { clearGuestToken } = useGuestTokenStore();
+  const { guestToken, clearGuestToken } = useGuestTokenStore();
 
   const [, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
 
@@ -43,8 +43,9 @@ export const useAuth = () => {
     clearGuestToken();
     removeCookie(COOKIE_NAME);
     setAuthState(AuthState.LoggedOut);
+    if (guestToken) return;
     await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
-  }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
+  }, [clearGuestToken, guestToken, removeCookie, removeUser, setAuthState]);
 
   return {
     login,
