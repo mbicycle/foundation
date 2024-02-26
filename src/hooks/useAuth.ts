@@ -43,7 +43,7 @@ export const useAuth = () => {
     clearGuestToken();
     removeCookie('token');
     setAuthState(AuthState.LoggedOut);
-    await logoutFn(msGraphInstance.msalInstance, true);
+    await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
   }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
 
   return {

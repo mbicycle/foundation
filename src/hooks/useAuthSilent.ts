@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { getGuestTokenValidity, logoutFn } from '@mbicycle/msal-bundle';
 import useAuthStore from 'stores/auth';
@@ -6,6 +6,7 @@ import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
 import { AuthState } from 'utils/const';
+import CONFIG from 'utils/envConfig';
 import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
 
@@ -13,23 +14,30 @@ const cookieOptions: CookieSetOptions = {
   path: '/',
   sameSite: 'none',
   secure: true,
-  domain: '.localhost',
+  domain: CONFIG.appDomain,
 };
 
 export const useAuthSilent = () => {
   const { setState: setAuthState } = useAuthStore();
-  const { setUser } = useUserStore();
-
-  const { guestToken, setGuestToken } = useGuestTokenStore();
+  const { setUser, removeUser } = useUserStore();
+  const { guestToken, setGuestToken, clearGuestToken } = useGuestTokenStore();
 
   const [{ token }, setCookie, removeCookie] = useCookies(['token']);
+
+  const logout = useCallback(async () => {
+    removeUser();
+    clearGuestToken();
+    removeCookie('token');
+    setAuthState(AuthState.LoggedOut);
+    await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
+  }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
     const queryLogout = searchParams.get('logout');
     if (queryLogout) {
-      logoutFn(msGraphInstance.msalInstance, true);
+      logout();
       return;
     }
 
@@ -67,7 +75,7 @@ export const useAuthSilent = () => {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
     });
-  }, [removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
+  }, [logout, removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
 
   return {
     token,
