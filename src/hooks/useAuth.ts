@@ -5,7 +5,7 @@ import useAuthStore from 'stores/auth';
 import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
-import { AuthState } from 'utils/const';
+import { AuthState, COOKIE_NAME } from 'utils/const';
 import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
 
@@ -21,7 +21,7 @@ export const useAuth = () => {
   const { setUser, removeUser } = useUserStore();
   const { clearGuestToken } = useGuestTokenStore();
 
-  const [{ token }, setCookie, removeCookie] = useCookies(['token']);
+  const [, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
 
   const login = useCallback(async () => {
     try {
@@ -31,7 +31,7 @@ export const useAuth = () => {
         role: authResult.idTokenClaims.roles[0] || '',
       });
       setAuthState(AuthState.LoggedIn);
-      setCookie('token', authResult.accessToken, cookieOptions);
+      setCookie(COOKIE_NAME, authResult.accessToken, cookieOptions);
     } catch (e) {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
@@ -41,13 +41,12 @@ export const useAuth = () => {
   const logout = useCallback(async () => {
     removeUser();
     clearGuestToken();
-    removeCookie('token');
+    removeCookie(COOKIE_NAME);
     setAuthState(AuthState.LoggedOut);
     await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
   }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
 
   return {
-    token,
     login,
     logout,
   };

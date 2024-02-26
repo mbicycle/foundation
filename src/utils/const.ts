@@ -9,3 +9,5 @@ export enum Routes {
     Dashboard = '/dashboard',
     Redirect = '/redirect',
 }
+
+export const COOKIE_NAME = 'msalUserEmail';

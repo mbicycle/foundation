@@ -5,7 +5,7 @@ import useAuthStore from 'stores/auth';
 import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
-import { AuthState } from 'utils/const';
+import { AuthState, COOKIE_NAME } from 'utils/const';
 import CONFIG from 'utils/envConfig';
 import msGraphInstance from 'utils/msal';
 import type { CookieSetOptions } from 'utils/types';
@@ -18,16 +18,16 @@ const cookieOptions: CookieSetOptions = {
 };
 
 export const useAuthSilent = () => {
-  const { setState: setAuthState } = useAuthStore();
+  const { state: authState, setState: setAuthState } = useAuthStore();
   const { setUser, removeUser } = useUserStore();
   const { guestToken, setGuestToken, clearGuestToken } = useGuestTokenStore();
 
-  const [{ token }, setCookie, removeCookie] = useCookies(['token']);
+  const [, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
 
   const logout = useCallback(async () => {
     removeUser();
     clearGuestToken();
-    removeCookie('token');
+    removeCookie(COOKIE_NAME);
     setAuthState(AuthState.LoggedOut);
     await logoutFn(msGraphInstance.msalInstance, msGraphInstance.config.auth.redirectUri);
   }, [clearGuestToken, removeCookie, removeUser, setAuthState]);
@@ -36,7 +36,7 @@ export const useAuthSilent = () => {
     const searchParams = new URLSearchParams(window.location.search);
 
     const queryLogout = searchParams.get('logout');
-    if (queryLogout) {
+    if (queryLogout && authState !== AuthState.LoggedOut) {
       logout();
       return;
     }
@@ -67,7 +67,7 @@ export const useAuthSilent = () => {
           name: result.account.username,
           role: result.idTokenClaims.roles[0] || '',
         });
-        setCookie('token', result.accessToken, cookieOptions);
+        setCookie(COOKIE_NAME, result.account.username, cookieOptions);
       } else {
         setAuthState(AuthState.LoggedOut);
       }
@@ -75,10 +75,9 @@ export const useAuthSilent = () => {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
     });
-  }, [logout, removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
+  }, [authState, logout, removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
 
   return {
-    token,
     guestToken,
   };
 };
