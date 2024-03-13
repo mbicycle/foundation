@@ -7,8 +7,18 @@ import useGuestTokenStore from 'stores/guestToken';
 import useUserStore from 'stores/user';
 
 import { AuthState, COOKIE_NAME } from 'utils/const';
+import CONFIG from 'utils/envConfig';
+import msGraphInstance from 'utils/msal';
+import type { CookieSetOptions } from 'utils/types';
 
 import { useAuth } from './useAuth';
+
+const cookieOptions: CookieSetOptions = {
+  path: '/',
+  sameSite: 'none',
+  secure: true,
+  domain: CONFIG.appDomain,
+};
 
 export const useAuthSilent = () => {
   const { login, logout } = useAuth();
@@ -17,6 +27,15 @@ export const useAuthSilent = () => {
   const { guestToken, setGuestToken } = useGuestTokenStore();
 
   const [, setCookie, removeCookie] = useCookies([COOKIE_NAME]);
+
+  useEffect(() => {
+    if (authState === AuthState.LoggedIn) {
+      msGraphInstance.acquireToken().then((authResult) => {
+        // TODO: if there is no cookie, set it
+        if (authResult) setCookie(COOKIE_NAME, authResult.account.username, cookieOptions);
+      });
+    }
+  }, [authState, setCookie]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -44,7 +63,7 @@ export const useAuthSilent = () => {
           }
         });
     }
-  }, [authState, logout, removeCookie, setAuthState, setCookie, setGuestToken, setUser]);
+  }, [authState, logout, removeCookie, setAuthState, setGuestToken, setUser]);
 
   return {
     guestToken,

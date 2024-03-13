@@ -33,7 +33,7 @@ export const useAuth = () => {
         role: authResult.idTokenClaims.roles[0] || '',
       });
       setAuthState(AuthState.LoggedIn);
-      setCookie(COOKIE_NAME, authResult.accessToken, cookieOptions);
+      setCookie(COOKIE_NAME, authResult.account.username, cookieOptions);
     } catch (e) {
       console.error(e);
       setAuthState(AuthState.LoggedOut);
