@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useAuthStore from 'stores/auth';
@@ -12,8 +12,23 @@ function Redirect() {
   const { state: authState } = useAuthStore();
   const navigate = useNavigate();
 
+  const redirectHandler = useCallback(() => {
+    if (window.location.search.includes('logout')) {
+      return navigate(`${Routes.Login}?logout=true`);
+    }
+    if (window.location.search.includes('token')) {
+      return navigate(`${Routes.Login}${window.location.search}`);
+    }
+    if (authState === AuthState.LoggedIn) return navigate(Routes.Dashboard);
+    return navigate(Routes.Login);
+  }, [authState, navigate]);
+
+  useEffect(() => {
+    redirectHandler();
+  }, [redirectHandler]);
+
   const linkHandle = () => {
-    navigate(authState === AuthState.LoggedIn ? Routes.Dashboard : Routes.Dashboard);
+    navigate(authState === AuthState.LoggedIn ? Routes.Dashboard : Routes.Login);
   };
 
   return (

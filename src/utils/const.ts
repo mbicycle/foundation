@@ -1,3 +1,6 @@
+import CONFIG from './envConfig';
+import type { CookieSetOptions } from './types';
+
 export enum AuthState {
     Loading = 'loading',
     LoggedIn = 'loggedIn',
@@ -5,9 +8,16 @@ export enum AuthState {
 }
 
 export enum Routes {
-    Login = '/',
+    Base = '/',
+    Login = '/login',
     Dashboard = '/dashboard',
-    Redirect = '/redirect',
 }
+
+export const cookieOptions: CookieSetOptions = {
+  path: '/',
+  sameSite: 'none',
+  secure: true,
+  domain: CONFIG.appDomain,
+};
 
 export const COOKIE_NAME = 'msalUserEmail';

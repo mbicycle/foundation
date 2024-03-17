@@ -13,7 +13,7 @@ import withProtected from './withProtectedHOC';
 function Router() {
   return (
     <RoutesComponent>
-      <Route path={Routes.Redirect} element={<Redirect />} />
+      <Route path={Routes.Base} element={<Redirect />} />
       <Route path={Routes.Login} element={<Login />} />
       <Route path={Routes.Dashboard} element={withProtected(<Dashboard />)} />
     </RoutesComponent>
